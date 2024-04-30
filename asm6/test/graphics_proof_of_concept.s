@@ -14,32 +14,14 @@ END_OF_DISPLAY:
 
 
 main:
-
-background:
-	la      $t0, DISPLAY
-        addi    $t8, $t8, 1284	                # i = 2047 (half the screen)
-	addi    $t1, $zero, 0x0000000           # blk main bg
-	bg_inner:
-		beq $t8, $zero, AFTER
-		sw      $t1, -16($t0)	        # store color in pixel
-		add     $t0, $t0, 4
-		addi    $t8, $t8, -1
-		j bg_inner
-AFTER: 
-
-	la      $t7, DISPLAY			# t7 = frambuffer
-
-		
-	addi    $t6, $zero, 0x00fff7            # Teal initial player pos
-	sw      $t6, 252($t7)	                # store player in pixel 7544
-#	sw      $t6, 8064($t7)	                # store player in pixel (63,63)
-
-	
+	la	$t7, DISPLAY
 game_loop:
 	lui     $t0, 0xffff
 	addi    $t8, $zero,1
 	sll     $t8, $zero, 30    # LOOP_COUNT = 2^20
-	jal 	playerbg	 # player scene
+	jal 	playerbg	  # player scene
+	jal	background_TOP	  # top scenery
+	jal 	background_BOTTOM # Bottom scene
 
 OUTER_LOOP:	
 	lw      $t1, 0($t0)      # read control register
@@ -161,10 +143,11 @@ inner_C2:
 		
 after_inner_C2:	
 	jal 	playerbg	 # player scene
+	jal 	background_TOP	 # player scene
+	jal 	background_BOTTOM # Bottom scene
+	
  	j DELAY_LOOP	
- 	
- 		
- 			
+		
 handleS:
 	addiu    $t3, $zero, 5
 	inner_S:
@@ -218,9 +201,9 @@ DELAY_DONE:
 ####################
 playerbg:
 addiu $sp, $sp, -52 # allocate stack space -- default of 24 here
-sw $fp, 0($sp) # save caller’s frame pointer
+sw $fp, 0($sp) # save callerï¿½s frame pointer
 sw $ra, 4($sp) # save return address
-addiu $fp, $sp, 48 # setup main’s frame pointer
+addiu $fp, $sp, 48 # setup mainï¿½s frame pointer
 
     # Store them t's
     sw $t0, 44($sp)      # Save temporary register $t0
@@ -287,6 +270,105 @@ AFTER_fg_inner:
 
 
 lw $ra, 4($sp) # get return address from stack
-lw $fp, 0($sp) # restore the caller’s frame pointer
-addiu $sp, $sp, 52 # restore the caller’s stack pointer
-jr $ra # return to caller’s code
+lw $fp, 0($sp) # restore the callerï¿½s frame pointer
+addiu $sp, $sp, 52 # restore the callerï¿½s stack pointer
+jr $ra # return to callerï¿½s code
+
+background_TOP:
+	addiu $sp, $sp, -52 # allocate stack space -- default of 24 here
+	sw $fp, 0($sp) # save callerï¿½s frame pointer
+	sw $ra, 4($sp) # save return address
+	addiu $fp, $sp, 48 # setup mainï¿½s frame pointer
+
+    	# Store them t's
+   	sw $t0, 44($sp)      # Save temporary register $t0
+    	sw $t1, 40($sp)      # Save temporary register $t0
+    	sw $t2, 36($sp)      # Save temporary register $t0
+    	sw $t3, 32($sp)       # Save temporary register $t0
+    	sw $t4, 28($sp)       # Save temporary register $t0
+    	sw $t5, 24($sp)       # Save temporary register $t0
+    	sw $t6, 20($sp)       # Save temporary register $t0
+    	sw $t7, 16($sp)       # Save temporary register $t0
+    	sw $t8, 12($sp)       # Save temporary register $t0
+    	sw $t9, 8($sp)        # Save temporary register $t0
+    	
+bg_top_loop:
+	
+	la	$t0, DISPLAY
+	addi	$t8, $zero, 1216
+	addi    $t1, $zero,  0x14FF00         # green
+	bg_top_inner:
+		beq	$t8, $zero, AFTER_BG_TOP_INNER
+		sw 	$t1, 0($t0)
+		add	$t0, $t0, 4
+		addi	$t8, $t8, -1
+		j bg_top_inner
+    
+AFTER_BG_TOP_INNER:
+       # load them t's
+    	lw $t0, 44($sp)       # Save temporary register $t0
+    	lw $t1, 40($sp)       # Save temporary register $t0
+    	lw $t2, 36($sp)       # Save temporary register $t0
+    	lw $t3, 32($sp)       # Save temporary register $t0
+    	lw $t4, 28($sp)       # Save temporary register $t0
+    	lw $t5, 24($sp)       # Save temporary register $t0
+    	lw $t6, 20($sp)       # Save temporary register $t0
+    	lw $t7, 16($sp)       # Save temporary register $t0
+    	lw $t8, 12($sp)       # Save temporary register $t0
+    	lw $t9, 8($sp)        # Save temporary register $t0
+
+
+lw $ra, 4($sp) # get return address from stack
+lw $fp, 0($sp) # restore the callerï¿½s frame pointer
+addiu $sp, $sp, 52 # restore the callerï¿½s stack pointer
+jr $ra # return to callerï¿½s code
+
+background_BOTTOM:
+	addiu $sp, $sp, -52 # allocate stack space -- default of 24 here
+	sw $fp, 0($sp) # save callerï¿½s frame pointer
+	sw $ra, 4($sp) # save return address
+	addiu $fp, $sp, 48 # setup mainï¿½s frame pointer
+
+    	# Store them t's
+   	sw $t0, 44($sp)      # Save temporary register $t0
+    	sw $t1, 40($sp)      # Save temporary register $t0
+    	sw $t2, 36($sp)      # Save temporary register $t0
+    	sw $t3, 32($sp)       # Save temporary register $t0
+    	sw $t4, 28($sp)       # Save temporary register $t0
+    	sw $t5, 24($sp)       # Save temporary register $t0
+    	sw $t6, 20($sp)       # Save temporary register $t0
+    	sw $t7, 16($sp)       # Save temporary register $t0
+    	sw $t8, 12($sp)       # Save temporary register $t0
+    	sw $t9, 8($sp)        # Save temporary register $t0
+    	
+bg_bot_loop:
+	
+	la	$t0, DISPLAY
+	addi	$t8, $zero, 1024
+	addi    $t1, $zero,  0x223A3D         # greyish
+	bg_bot_inner:
+		beq	$t8, $zero, AFTER_BG_BOT_INNER
+		sw 	$t1, 7424($t0)
+		add	$t0, $t0, 4
+		addi	$t8, $t8, -1
+		j bg_bot_inner
+    
+AFTER_BG_BOT_INNER:
+       # load them t's
+    	lw $t0, 44($sp)       # Save temporary register $t0
+    	lw $t1, 40($sp)       # Save temporary register $t0
+    	lw $t2, 36($sp)       # Save temporary register $t0
+    	lw $t3, 32($sp)       # Save temporary register $t0
+    	lw $t4, 28($sp)       # Save temporary register $t0
+    	lw $t5, 24($sp)       # Save temporary register $t0
+    	lw $t6, 20($sp)       # Save temporary register $t0
+    	lw $t7, 16($sp)       # Save temporary register $t0
+    	lw $t8, 12($sp)       # Save temporary register $t0
+    	lw $t9, 8($sp)        # Save temporary register $t0
+
+lw $ra, 4($sp) # get return address from stack
+lw $fp, 0($sp) # restore the callerï¿½s frame pointer
+addiu $sp, $sp, 52 # restore the callerï¿½s stack pointer
+jr $ra # return to callerï¿½s code
+    
+    
